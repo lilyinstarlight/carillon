@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+import json
+import os
+import signal
+import subprocess
+
+os.chdir(os.path.dirname(__file__))
+
+nginx = subprocess.Popen(['/usr/sbin/nginx', '-p', os.getcwd(), '-c', 'conf/nginx.conf'])
+ffserver = subprocess.Popen(['/usr/bin/ffserver', '-f', 'conf/ffserver.conf'])
+
+def terminate(signum, siginfo):
+    nginx.terminate()
+    ffserver.terminate()
+
+signal.signal(signal.SIGINT, terminate)
+signal.signal(signal.SIGTERM, terminate)
+
+nginx.wait()
+ffserver.wait()
