@@ -4,17 +4,64 @@ import os
 import signal
 import subprocess
 
-os.chdir(os.path.dirname(__file__))
+import urwid
 
-nginx = subprocess.Popen(['/usr/sbin/nginx', '-p', os.getcwd(), '-c', 'conf/nginx.conf'])
-ffserver = subprocess.Popen(['/usr/bin/ffserver', '-f', 'conf/ffserver.conf'])
 
-def terminate(signum, siginfo):
-    nginx.terminate()
-    ffserver.terminate()
+class CarillonDisplay:
+    def __init__(self):
+        self.title = urwid.Edit('Title: ')
+        self.composer = urwid.Edit('Composer: ')
 
-signal.signal(signal.SIGINT, terminate)
-signal.signal(signal.SIGTERM, terminate)
+        self.update_button = urwid.Button('Update', self.update)
+        self.clear_button = urwid.Button('Clear', self.clear)
+        self.buttons = urwid.Columns([(10, self.update_button), urwid.Divider(), (9, self.clear_button)])
 
-nginx.wait()
-ffserver.wait()
+        self.pile = urwid.Pile([self.title, self.composer, urwid.Divider(), self.buttons])
+
+        self.loop = urwid.MainLoop(urwid.Filler(urwid.Padding(self.pile, width=40, align='center')))
+
+        self.clear()
+
+    def run(self):
+        self.loop.run()
+
+    def exit(self):
+        raise urwid.ExitMainLoop()
+
+    def update(self, _=None):
+        with open(os.path.join(os.getcwd(), 'www/details.json'), 'w') as file:
+            file.write(json.dumps({'title': self.title.edit_text, 'composer': self.composer.edit_text}))
+
+    def clear(self, _=None):
+        self.title.set_edit_text('None')
+        self.composer.set_edit_text('None')
+
+        self.update(_)
+
+
+nginx_cmd = ['/usr/sbin/nginx', '-p', os.getcwd(), '-c', 'conf/nginx.conf']
+ffserver_cmd = ['/usr/bin/ffserver', '-f', 'conf/ffserver.conf']
+
+
+if __name__ == '__main__':
+    os.chdir(os.path.dirname(__file__))
+
+    try:
+        nginx = subprocess.Popen(nginx_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        ffserver = subprocess.Popen(ffserver_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+
+        display = CarillonDisplay()
+
+        signal.signal(signal.SIGINT, lambda signum, siginfo: display.exit())
+        signal.signal(signal.SIGTERM, lambda signum, siginfo: display.exit())
+
+        display.run()
+    finally:
+        try:
+            nginx.terminate()
+        except:
+            None
+        try:
+            ffserver.terminate()
+        except:
+            None

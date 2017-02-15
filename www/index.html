@@ -11,13 +11,26 @@
 	</head>
 
 	<body>
+		<audio id="stream" autoplay><source src="stream.mp3" type="audio/mpeg"/></audio>
+
 		<header>
+			<span class="left">Clemson University Carillon</span>
+
+			<ul class="right">
+				<li><a id="play" href="#">Pause</a></li>
+				<li><a href="stream.mp3">Stream</a></li>
+			</ul>
 		</header>
 
 		<main>
+			<noscript><p>You need JavaScript enabled to view stream metadata</p></noscript>
+
+			<p id="title">Loading...</p>
+			<p id="composer">Loading...</p>
 		</main>
 
 		<footer>
+			<p>&copy; 2017 Clemson University</p>
 		</footer>
 	</body>
 </html>
