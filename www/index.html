@@ -14,19 +14,34 @@
 		<audio id="stream" autoplay><source src="stream.mp3" type="audio/mpeg"/></audio>
 
 		<header>
-			<span class="left">Clemson University Carillon</span>
+			<div>
+				<img src="clemson.png" alt=""/>
+				<span>Carillon</span>
+			</div>
 
-			<ul class="right">
+			<ul>
 				<li><a id="play" href="#">Pause</a></li>
 				<li><a href="stream.mp3">Stream</a></li>
 			</ul>
 		</header>
 
 		<main>
+			<p>Now Playing:</p>
+
 			<noscript><p>You need JavaScript enabled to view stream metadata</p></noscript>
 
-			<p id="title">Loading...</p>
-			<p id="composer">Loading...</p>
+			<table>
+				<tbody>
+					<tr>
+						<td>Title: </td>
+						<td id="title">Loading...</td>
+					<tr>
+					</tr>
+						<td>Composer: </td>
+						<td id="composer">Loading...</td>
+					</tr>
+				</tbody>
+			</table>
 		</main>
 
 		<footer>

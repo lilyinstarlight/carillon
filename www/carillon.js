@@ -24,7 +24,7 @@ var xhr = function(method, resource, data, callback) {
 
 var update = function() {
 	xhr('get', '/details.json', null, function(data) {
-		document.title = "Clemson University Carillon - " + data.title;
+		document.title = 'Clemson University Carillon - ' + data.title;
 		title.innerText = data.title;
 		composer.innerText = data.composer;
 	});
