@@ -140,9 +140,3 @@ footer > p {
 		padding-top: 2em;
 	}
 }
-
-@media (max-width: 400px) {
-	header > div > span {
-		content: "Carillon";
-	}
-}
