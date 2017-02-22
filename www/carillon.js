@@ -1,3 +1,5 @@
+var playing = null;
+var metadata = null;
 var title = null;
 var composer = null;
 var play = null;
@@ -25,6 +27,12 @@ var xhr = function(method, resource, data, callback) {
 var update = function() {
 	xhr('get', '/details.json', null, function(data) {
 		document.title = 'Clemson University Carillon - ' + data.title;
+
+		if (data.live)
+			playing.innerText = 'Now Playing (Live):'
+		else
+			playing.innerText = 'Now Playing:'
+
 		title.innerText = data.title;
 		composer.innerText = data.composer;
 	});
@@ -33,6 +41,8 @@ var update = function() {
 };
 
 var load = function() {
+	playing = document.getElementById('playing');
+	metadata = document.getElementById('metadata');
 	title = document.getElementById('title');
 	composer = document.getElementById('composer');
 	play = document.getElementById('play');
@@ -48,6 +58,8 @@ var load = function() {
 			play.innerText = 'Play';
 		}
 	};
+
+	metadata.style.display = 'initial';
 
 	update();
 };

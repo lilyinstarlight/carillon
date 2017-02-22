@@ -11,12 +11,13 @@ class CarillonDisplay:
     def __init__(self):
         self.title = urwid.Edit('Title: ')
         self.composer = urwid.Edit('Composer: ')
+        self.live = urwid.CheckBox('Live')
 
         self.update_button = urwid.Button('Update', self.update)
         self.clear_button = urwid.Button('Clear', self.clear)
         self.buttons = urwid.Columns([(10, self.update_button), urwid.Divider(), (9, self.clear_button)])
 
-        self.pile = urwid.Pile([self.title, self.composer, urwid.Divider(), self.buttons])
+        self.pile = urwid.Pile([self.title, self.composer, self.live, urwid.Divider(), self.buttons])
 
         self.loop = urwid.MainLoop(urwid.Filler(urwid.Padding(self.pile, width=40, align='center')))
 
@@ -30,11 +31,12 @@ class CarillonDisplay:
 
     def update(self, _=None):
         with open(os.path.join(os.getcwd(), 'www/details.json'), 'w') as file:
-            file.write(json.dumps({'title': self.title.edit_text, 'composer': self.composer.edit_text}))
+            file.write(json.dumps({'live': self.live.state, 'title': self.title.edit_text, 'composer': self.composer.edit_text}))
 
     def clear(self, _=None):
         self.title.set_edit_text('None')
         self.composer.set_edit_text('None')
+        self.live.set_state(False)
 
         self.update(_)
 
