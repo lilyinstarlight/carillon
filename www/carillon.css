@@ -88,6 +88,7 @@ header > ul > li {
 	padding: 1em;
 	display: inline;
 	text-decoration: none;
+	color: #222;
 }
 
 header > ul > li > a {

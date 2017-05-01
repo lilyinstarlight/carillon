@@ -2,8 +2,13 @@ var playing = null;
 var metadata = null;
 var title = null;
 var composer = null;
+var vol = null;
+var voldown = null;
+var volup = null;
 var play = null;
 var stream = null;
+
+var volume = 0.5;
 
 var xhr = function(method, resource, data, callback) {
 	var req = new XMLHttpRequest();
@@ -40,13 +45,39 @@ var update = function() {
 	setTimeout(update, 2000);
 };
 
+var volupdate = function() {
+	stream.volume = volume;
+	vol.innerText = stream.volume.toFixed(1);
+};
+
 var load = function() {
 	playing = document.getElementById('playing');
 	metadata = document.getElementById('metadata');
 	title = document.getElementById('title');
 	composer = document.getElementById('composer');
+	vol = document.getElementById('vol');
+	voldown = document.getElementById('voldown');
+	volup = document.getElementById('volup');
 	play = document.getElementById('play');
 	stream = document.getElementById('stream');
+
+	stream.volume = 0.5;
+
+	voldown.onclick = function() {
+		volume -= 0.1;
+		if (volume <= 0)
+			volume = 0;
+
+		volupdate();
+	};
+
+	volup.onclick = function() {
+		volume += 0.1;
+		if (volume >= 1)
+			volume = 1;
+
+		volupdate();
+	};
 
 	play.onclick = function() {
 		if (stream.paused) {
@@ -61,6 +92,7 @@ var load = function() {
 
 	metadata.style.display = 'initial';
 
+	volupdate();
 	update();
 };
 
