@@ -121,6 +121,10 @@ footer > p {
 }
 
 @media (max-width: 1000px) {
+	body {
+		font-size: 2em;
+	}
+
 	header {
 		flex-direction: column;
 		height: initial;
@@ -132,6 +136,10 @@ footer > p {
 }
 
 @media (max-width: 700px) {
+	body {
+		font-size: 2em;
+	}
+
 	header > div {
 		flex-direction: column;
 	}
