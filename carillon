@@ -22,12 +22,22 @@ class CarillonDisplay:
         self.loop = urwid.MainLoop(urwid.Filler(urwid.Padding(self.pile, width=40, align='center')))
 
         self.clear()
+        self.refresh()
 
     def run(self):
         self.loop.run()
 
     def exit(self):
         raise urwid.ExitMainLoop()
+
+    def refresh(self, _=None, _=None):
+        with open(os.path.join(os.getcwd(), 'www/details.json'), 'r') as file:
+            data = json.loads(file.read())
+            self.live.state = data['live']
+            self.title.edit_text = data['title']
+            self.composer.edit_text = data['composer']
+
+        self.loop.set_alarm_in(2, self.refresh)
 
     def update(self, _=None):
         with open(os.path.join(os.getcwd(), 'www/details.json'), 'w') as file:
@@ -43,6 +53,7 @@ class CarillonDisplay:
 
 nginx_cmd = ['/usr/sbin/nginx', '-p', os.getcwd(), '-c', 'conf/nginx.conf']
 ffserver_cmd = ['/usr/bin/ffserver', '-f', 'conf/ffserver.conf']
+update_cmd = ['/bin/sh', '-c', 'cd ' + os.getcwd() + '/upd && npm install && exec npm start']
 
 
 if __name__ == '__main__':
@@ -51,6 +62,7 @@ if __name__ == '__main__':
     try:
         nginx = subprocess.Popen(nginx_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         ffserver = subprocess.Popen(ffserver_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        update = subprocess.Popen(update_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
         display = CarillonDisplay()
 
@@ -65,5 +77,9 @@ if __name__ == '__main__':
             None
         try:
             ffserver.terminate()
+        except:
+            None
+        try:
+            update.terminate()
         except:
             None

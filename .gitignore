@@ -2,3 +2,4 @@
 /run/*
 /tmp/*
 /www/details.json
+/upd/node_modules
