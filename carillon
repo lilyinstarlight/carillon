@@ -30,7 +30,7 @@ class CarillonDisplay:
     def exit(self):
         raise urwid.ExitMainLoop()
 
-    def refresh(self, _=None, _=None):
+    def refresh(self, _=None, __=None):
         with open(os.path.join(os.getcwd(), 'www/details.json'), 'r') as file:
             data = json.loads(file.read())
             self.live.state = data['live']

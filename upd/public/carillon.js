@@ -67,7 +67,7 @@ var load = function() {
 		composer.value = 'None';
 		live.checked = false;
 
-		metadata.submit();
+		send();
 
 		ev.preventDefault();
 	};
