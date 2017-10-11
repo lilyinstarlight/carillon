@@ -7,8 +7,8 @@ carillon is an online radio for the Clemson University Memorial Carillon. It fea
 Requirements
 ------------
 
-* Python
-* Python Urwid
+* Python 3
+* Urwid (Python 3)
 * Node.js
 * Nginx
 * FFmpeg
