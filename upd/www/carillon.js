@@ -31,6 +31,8 @@ var refresh = function() {
 			last = data;
 		}
 
+		console.log(data);
+		console.log(last);
 		if (data['composer'] !== last['composer']) {
 			composer.value = data['composer'];
 			last = data;

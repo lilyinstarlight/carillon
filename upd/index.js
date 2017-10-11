@@ -8,7 +8,7 @@ var app = express();
 
 app.use(bodyParser.json());
 
-app.use(express.static('public'));
+app.use(express.static('www'));
 
 app.get('/metadata', function (req, res) {
   fs.readFile(path.join(__dirname, '..', 'www', 'details.json'), function (err, data) {
