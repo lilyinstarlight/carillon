@@ -4,7 +4,7 @@
   "description": "Carillon interface for Clemson's Memorial Carillon",
   "homepage": "https://github.com/fkmclane/carillon",
   "scripts": {
-    "start": "node index.js || nodejs index.js"
+    "start": "sh -c 'node index.js || nodejs index.js'"
   },
   "engines": {
     "node": "~6.11"
