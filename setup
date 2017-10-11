@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 pushd "$(dirname "$(readlink -f "$0")")/www" &>/dev/null
 
 curl -sO https://www.clemson.edu/_template-assets/1889/fonts/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg
