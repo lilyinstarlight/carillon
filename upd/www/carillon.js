@@ -28,19 +28,17 @@ var refresh = function() {
 	xhr('get', '/metadata', null, function(data) {
 		if (data['title'] !== last['title']) {
 			title.value = data['title'];
-			last = data;
+			last['title'] = data['title'];
 		}
 
-		console.log(data);
-		console.log(last);
 		if (data['composer'] !== last['composer']) {
 			composer.value = data['composer'];
-			last = data;
+			last['composer'] = data['composer'];
 		}
 
 		if (data['live'] !== last['live']) {
 			live.checked = data['live'];
-			last = data;
+			last['live'] = data['live'];
 		}
 
 		setTimeout(refresh, 2000);
