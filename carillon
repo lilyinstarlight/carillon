@@ -3,6 +3,7 @@ import json
 import os
 import signal
 import subprocess
+import sys
 
 import urwid
 
@@ -66,18 +67,31 @@ if __name__ == '__main__':
 
         signal.signal(signal.SIGINT, lambda signum, siginfo: display.exit())
         signal.signal(signal.SIGTERM, lambda signum, siginfo: display.exit())
+        signal.signal(signal.SIGCHLD, lambda signum, siginfo: display.exit())
 
         display.run()
     finally:
         try:
-            nginx.terminate()
+            if nginx.poll():
+                sys.stderr.write('nginx returned an error\n')
+            else:
+                nginx.terminate()
+                nginx.wait()
         except:
             None
         try:
-            ffserver.terminate()
+            if ffserver.poll():
+                sys.stderr.write('ffserver returned an error\n')
+            else:
+                ffserver.terminate()
+                ffserver.wait()
         except:
             None
         try:
-            update.terminate()
+            if update.poll():
+                sys.stderr.write('updater application returned an error\n')
+            else:
+                update.terminate()
+                update.wait()
         except:
             None
