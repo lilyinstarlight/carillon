@@ -30,7 +30,7 @@ var xhr = function(method, resource, data, callback) {
 };
 
 var update = function() {
-	xhr('get', '/details.json', null, function(data) {
+	xhr('get', 'details.json', null, function(data) {
 		document.title = 'Clemson University Carillon - ' + data.title;
 
 		if (data.live)

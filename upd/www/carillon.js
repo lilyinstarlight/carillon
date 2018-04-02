@@ -25,7 +25,7 @@ var xhr = function(method, resource, data, callback) {
 };
 
 var refresh = function() {
-	xhr('get', '/metadata', null, function(data) {
+	xhr('get', 'metadata', null, function(data) {
 		if (data['title'] !== last['title']) {
 			title.value = data['title'];
 			last['title'] = data['title'];
@@ -46,7 +46,7 @@ var refresh = function() {
 };
 
 var send = function() {
-	xhr('post', '/metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked});
+	xhr('post', 'metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked});
 };
 
 var load = function() {
