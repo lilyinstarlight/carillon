@@ -22,6 +22,8 @@ class CarillonDisplay:
 
         self.loop = urwid.MainLoop(urwid.Filler(urwid.Padding(self.pile, width=40, align='center')))
 
+        self.last_mtime = 0
+
         self.clear()
         self.refresh()
 
@@ -32,11 +34,15 @@ class CarillonDisplay:
         raise urwid.ExitMainLoop()
 
     def refresh(self, _=None, __=None):
-        with open(os.path.dirname(__file__) + '/www/details.json', 'r') as file:
-            data = json.loads(file.read())
-            self.live.state = data['live']
-            self.title.edit_text = data['title']
-            self.composer.edit_text = data['composer']
+        mtime = os.stat(os.path.dirname(__file__) + '/www/details.json').st_mtime
+        if mtime > self.last_mtime:
+            self.last_mtime = mtime
+
+            with open(os.path.dirname(__file__) + '/www/details.json', 'r') as file:
+                data = json.loads(file.read())
+                self.live.state = data['live']
+                self.title.edit_text = data['title']
+                self.composer.edit_text = data['composer']
 
         self.loop.set_alarm_in(2, self.refresh)
 
