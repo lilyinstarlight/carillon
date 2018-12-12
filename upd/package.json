@@ -10,8 +10,8 @@
     "node": "~6.11"
   },
   "dependencies": {
-    "express": "~4.16",
-    "body-parser": "~1.18"
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
   },
   "repository": {
     "type": "git",
