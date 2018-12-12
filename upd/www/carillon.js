@@ -41,7 +41,7 @@ var refresh = function() {
 			last['live'] = data['live'];
 		}
 
-		setTimeout(refresh, 2000);
+		setTimeout(refresh, 1000);
 	});
 };
 
