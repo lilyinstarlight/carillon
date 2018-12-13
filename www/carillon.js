@@ -42,7 +42,7 @@ var update = function() {
 		composer.innerText = data.composer;
 	});
 
-	setTimeout(update, 2000);
+	setTimeout(update, 1000);
 };
 
 var volupdate = function() {
