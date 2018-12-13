@@ -20,6 +20,11 @@ curl -sO https://www.clemson.edu/_template-assets/1889/fonts/e741f29c-bc18-4343-
 
 curl -sO https://www.clemson.edu/brand/resources/logos/wordmark-academic/white-purple.png
 
+curl -sO https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js
+
+curl -sO https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.9/mediaelementplayer.min.css
+curl -sO https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.9/mediaelement-and-player.min.js
+
 popd &>/dev/null
 pushd "$(dirname "$(readlink -f "$0")")/upd/www" &>/dev/null
 

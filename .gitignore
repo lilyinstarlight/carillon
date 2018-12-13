@@ -1,7 +1,10 @@
 /log/*
 /run/*
 /tmp/*
+
 /www/details.json
+/www/stream/stream.*
+
 /www/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg
 /www/1454a71d-cdbb-429c-8092-122f4493e0c7.woff
 /www/1c164451-034c-41f5-9542-390709016510.woff
@@ -19,8 +22,12 @@
 /www/d5ea405c-2180-4ff0-bd51-3e19fb280be4.ttf
 /www/e741f29c-bc18-4343-bff3-db2465a0be3e.ttf
 /www/white-purple.png
-/www/stream/stream.*
+/www/jquery.slim.min.js
+/www/mediaelementplayer.min.css
+/www/mediaelement-and-player.min.js
+
 /upd/node_modules
+
 /upd/www/details.json
 /upd/www/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg
 /upd/www/1454a71d-cdbb-429c-8092-122f4493e0c7.woff
