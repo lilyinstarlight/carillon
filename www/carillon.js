@@ -7,6 +7,7 @@ var volwrap = null;
 var voldown = null;
 var volup = null;
 var play = null;
+var load = null;
 var stream = null;
 
 var xhr = function(method, resource, data, callback) {
@@ -54,6 +55,7 @@ var load = function() {
 	voldown = document.getElementById('voldown');
 	volup = document.getElementById('volup');
 	play = document.getElementById('play');
+	load = document.getElementById('load');
 	stream = document.getElementById('stream');
 
 	var player = new MediaElementPlayer(document.getElementById('stream'), {
@@ -68,20 +70,24 @@ var load = function() {
 				vol.innerText = stream.volume.toFixed(1);
 			};
 
-			voldown.addEventListener('click', function() {
+			voldown.addEventListener('click', function(ev) {
 				volume -= 0.1;
 				if (volume <= 0)
 					volume = 0;
 
 				volupdate();
+
+				ev.preventDefault();
 			}, false);
 
-			volup.addEventListener('click', function() {
+			volup.addEventListener('click', function(ev) {
 				volume += 0.1;
 				if (volume >= 1)
 					volume = 1;
 
 				volupdate();
+
+				ev.preventDefault();
 			}, false);
 
 			var playupdate = function() {
@@ -99,15 +105,24 @@ var load = function() {
 				playupdate();
 			}, false);
 
-			play.addEventListener('click', function() {
+			play.addEventListener('click', function(ev) {
 				if (stream.paused)
 					stream.play();
 				else
 					stream.pause();
+
+				ev.preventDefault();
+			}, false);
+
+			load.addEventListener('click', function(ev) {
+				stream.load();
+
+				ev.preventDefault();
 			}, false);
 
 			volwrap.style.display = 'initial';
 			play.style.display = 'initial';
+			load.style.display = 'initial';
 			metadata.style.display = 'initial';
 
 			volupdate();
