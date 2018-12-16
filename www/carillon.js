@@ -123,6 +123,8 @@ var load = function() {
 
 			volwrap.style.display = 'initial';
 			play.style.display = 'initial';
+			playinfo.style.display = 'initial';
+			playarrow.style.display = 'initial';
 			metadata.style.display = 'initial';
 
 			volupdate();

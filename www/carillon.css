@@ -131,6 +131,8 @@ footer > p {
 }
 
 #playinfo {
+	display: none;
+
 	position: absolute;
 	width: 14em;
 	top: 4em;
@@ -138,6 +140,8 @@ footer > p {
 }
 
 #playarrow {
+	display: none;
+
 	position: absolute;
 	top: 4em;
 	left: 1.6em;
