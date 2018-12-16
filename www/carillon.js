@@ -7,7 +7,6 @@ var volwrap = null;
 var voldown = null;
 var volup = null;
 var play = null;
-var load = null;
 var stream = null;
 
 var xhr = function(method, resource, data, callback) {
@@ -55,7 +54,6 @@ var load = function() {
 	voldown = document.getElementById('voldown');
 	volup = document.getElementById('volup');
 	play = document.getElementById('play');
-	load = document.getElementById('load');
 	stream = document.getElementById('stream');
 
 	var player = new MediaElementPlayer(document.getElementById('stream'), {
@@ -114,15 +112,8 @@ var load = function() {
 				ev.preventDefault();
 			}, false);
 
-			load.addEventListener('click', function(ev) {
-				stream.load();
-
-				ev.preventDefault();
-			}, false);
-
 			volwrap.style.display = 'initial';
 			play.style.display = 'initial';
-			load.style.display = 'initial';
 			metadata.style.display = 'initial';
 
 			volupdate();
