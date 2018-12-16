@@ -84,12 +84,19 @@ var load = function() {
 				volupdate();
 			}, false);
 
+			var playupdate = function() {
+				if (stream.paused)
+					play.innerText = 'Play';
+				else
+					play.innerText = 'Pause';
+			};
+
 			stream.addEventListener('play', function() {
-				play.innerText = 'Pause';
+				playupdate();
 			}, false);
 
 			stream.addEventListener('pause', function() {
-				play.innerText = 'Play';
+				playupdate();
 			}, false);
 
 			play.addEventListener('click', function() {
