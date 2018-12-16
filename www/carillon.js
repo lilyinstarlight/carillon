@@ -84,20 +84,19 @@ var load = function() {
 				volupdate();
 			}, false);
 
-			var playupdate = function() {
-				if (stream.paused)
-					play.innerText = 'Play';
-				else
-					play.innerText = 'Pause';
-			};
+			stream.addEventListener('play', function() {
+				play.innerText = 'Pause';
+			}, false);
+
+			stream.addEventListener('pause', function() {
+				play.innerText = 'Play';
+			}, false);
 
 			play.addEventListener('click', function() {
 				if (stream.paused)
 					stream.play();
 				else
 					stream.pause();
-
-				playupdate();
 			}, false);
 
 			volwrap.style.display = 'initial';
