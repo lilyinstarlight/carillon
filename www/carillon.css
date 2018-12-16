@@ -89,6 +89,8 @@ header > ul > li {
 	display: inline;
 	text-decoration: none;
 	color: #222;
+
+	position: relative;
 }
 
 header > ul > li a {
@@ -128,6 +130,19 @@ footer > p {
 	display: none;
 }
 
+#playinfo {
+	position: absolute;
+	width: 14em;
+	top: 4em;
+	left: -12em;
+}
+
+#playarrow {
+	position: absolute;
+	top: 4em;
+	left: 1.6em;
+}
+
 #playing {
 	display: none;
 }
@@ -153,6 +168,15 @@ footer > p {
 	header > ul {
 		margin-left: initial;
 	}
+
+	main {
+		padding-top: 3em;
+	}
+
+	#playinfo {
+		width: 7em;
+		left: -6em;
+	}
 }
 
 @media (max-width: 700px) {
@@ -167,5 +191,14 @@ footer > p {
 	header > div > img {
 		padding-left: initial;
 		padding-top: 2em;
+	}
+
+	main {
+		padding-top: 3em;
+	}
+
+	#playinfo {
+		width: 7em;
+		left: -6em;
 	}
 }

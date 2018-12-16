@@ -7,6 +7,8 @@ var volwrap = null;
 var voldown = null;
 var volup = null;
 var play = null;
+var playinfo = null;
+var playarrow = null;
 var stream = null;
 
 var xhr = function(method, resource, data, callback) {
@@ -54,6 +56,8 @@ var load = function() {
 	voldown = document.getElementById('voldown');
 	volup = document.getElementById('volup');
 	play = document.getElementById('play');
+	playinfo = document.getElementById('playinfo');
+	playarrow = document.getElementById('playarrow');
 	stream = document.getElementById('stream');
 
 	var player = new MediaElementPlayer(document.getElementById('stream'), {
@@ -104,6 +108,11 @@ var load = function() {
 			}, false);
 
 			play.addEventListener('click', function(ev) {
+				if (playinfo.style.display !== 'none')
+					playinfo.style.display = 'none';
+				if (playarrow.style.display !== 'none')
+					playarrow.style.display = 'none';
+
 				if (stream.paused)
 					stream.play();
 				else
