@@ -70,7 +70,7 @@ os.chdir(os.path.dirname(__file__))
 
 nginx_cmd = ['/bin/sh', 'conf/nginx.sh']
 ffmpeg_cmd = ['/bin/sh', 'conf/ffmpeg.sh']
-update_cmd = ['/bin/sh', '-c', 'cd upd && npm install && exec npm start']
+update_cmd = ['/bin/sh', 'conf/upd.sh']
 
 
 if __name__ == '__main__':
