@@ -30,9 +30,26 @@ var xhr = function(method, resource, data, callback) {
 	}
 };
 
+var notify = function(title) {
+	if (document.hasFocus())
+		return;
+
+	document.title = title;
+
+	if (Notification.permission === 'granted')
+		var notification = new Notification(title);
+};
+
+if (Notification.permission !== 'granted' && Notification.permission !== 'denied')
+	Notification.requestPermission();
+
 var update = function() {
 	xhr('get', 'details.json', null, function(data) {
-		document.title = 'Clemson University Carillon - ' + data.title;
+		var new_title = 'Clemson University Carillon - ' + data.title;
+		if (document.title !== new_title) {
+			document.title = new_title;
+			notify(new_title);
+		}
 
 		if (data.live)
 			playing.innerText = 'Now Playing (Live):'
@@ -123,8 +140,10 @@ var load = function() {
 
 			volwrap.style.display = 'initial';
 			play.style.display = 'initial';
-			playinfo.style.display = 'initial';
-			playarrow.style.display = 'initial';
+			if (stream.paused) {
+				playinfo.style.display = 'initial';
+				playarrow.style.display = 'initial';
+			}
 			metadata.style.display = 'initial';
 
 			volupdate();
