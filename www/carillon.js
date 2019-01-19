@@ -48,9 +48,9 @@ var update = function() {
 		var new_title;
 
 		if (data.live)
-			new_title = 'Clemson University Carillon - ' + data.title;
-		else
 			new_title = 'Clemson University Carillon - ' + data.title + ' (Live)';
+		else
+			new_title = 'Clemson University Carillon - ' + data.title;
 
 		if (document.title !== new_title) {
 			document.title = new_title;
