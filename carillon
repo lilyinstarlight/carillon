@@ -88,24 +88,27 @@ if __name__ == '__main__':
         display.run()
     finally:
         try:
-            if nginx.poll():
-                sys.stderr.write('nginx returned an error\n')
+            ret = nginx.poll()
+            if ret:
+                sys.stderr.write('nginx returned an error ({})\n'.format(ret))
             else:
                 nginx.terminate()
                 nginx.wait()
         except:
             pass
         try:
-            if ffmpeg.poll():
-                sys.stderr.write('ffmpeg returned an error\n')
+            ret = ffmpeg.poll()
+            if ret and ret != 255:
+                sys.stderr.write('ffmpeg returned an error ({})\n'.format(ret))
             else:
                 ffmpeg.terminate()
                 ffmpeg.wait()
         except:
             pass
         try:
-            if update.poll():
-                sys.stderr.write('updater application returned an error\n')
+            ret = update.poll()
+            if ret:
+                sys.stderr.write('updater returned an error ({})\n'.format(ret))
             else:
                 update.terminate()
                 update.wait()

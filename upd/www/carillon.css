@@ -137,6 +137,10 @@ footer > p {
 	margin-right: auto;
 }
 
+#feedback {
+	display: none;
+}
+
 @media (max-width: 1000px) {
 	body {
 		font-size: 2em;

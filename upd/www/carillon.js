@@ -2,8 +2,10 @@ var metadata = null;
 var title = null;
 var composer = null;
 var live = null;
+var feedback = null;
 
 var last = {'title': null, 'composer': null, 'live': null};
+var timeout = null;
 
 var xhr = function(method, resource, data, callback) {
 	var req = new XMLHttpRequest();
@@ -46,7 +48,15 @@ var refresh = function() {
 };
 
 var send = function() {
-	xhr('post', 'metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked});
+	xhr('post', 'metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked}, function(response) {
+		feedback.style.display = 'initial';
+		if (timeout)
+			clearTimeout(timeout);
+		timeout = setTimeout(function() {
+			feedback.style.display = 'none';
+			timeout = null;
+		}, 3000);
+	});
 };
 
 var load = function() {
@@ -55,6 +65,8 @@ var load = function() {
 	title = document.getElementById('title');
 	composer = document.getElementById('composer');
 	live = document.getElementById('live');
+
+	feedback = document.getElementById('feedback');
 
 	metadata.onsubmit = function(ev) {
 		send();

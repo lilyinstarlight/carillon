@@ -1,5 +1,5 @@
 #!/bin/bash -e
-pushd "$(dirname "$(readlink -f "$0")")/www" &>/dev/null
+pushd "$(dirname "$(greadlink -f "$0")")/www" &>/dev/null
 
 curl -sO https://www.clemson.edu/_template-assets/1889/fonts/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg
 curl -sO https://www.clemson.edu/_template-assets/1889/fonts/1454a71d-cdbb-429c-8092-122f4493e0c7.woff
@@ -20,16 +20,16 @@ curl -sO https://www.clemson.edu/_template-assets/1889/fonts/e741f29c-bc18-4343-
 
 curl -sO https://www.clemson.edu/brand/resources/logos/wordmark-academic/white-purple.png
 
-curl -sO https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js
+curl -sO https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js
 
-curl -sO https://cdn.jsdelivr.net/npm/hls.js@0.12.1/dist/hls.min.js
-curl -sO https://cdn.jsdelivr.net/npm/hls.js@0.12.1/dist/hls.min.js.map
+curl -sO https://cdn.jsdelivr.net/npm/hls.js@0.12.4/dist/hls.min.js
+curl -sO https://cdn.jsdelivr.net/npm/hls.js@0.12.4/dist/hls.min.js.map
 
-curl -sO https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.9/mediaelementplayer.min.css
-curl -sO https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.9/mediaelement-and-player.min.js
+curl -sO https://cdn.jsdelivr.net/npm/mediaelement@4.2.14/build/mediaelementplayer.min.css
+curl -sO https://cdn.jsdelivr.net/npm/mediaelement@4.2.14/build/mediaelement-and-player.min.js
 
 popd &>/dev/null
-pushd "$(dirname "$(readlink -f "$0")")/upd/www" &>/dev/null
+pushd "$(dirname "$(greadlink -f "$0")")/upd/www" &>/dev/null
 
 curl -sO https://www.clemson.edu/_template-assets/1889/fonts/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg
 curl -sO https://www.clemson.edu/_template-assets/1889/fonts/1454a71d-cdbb-429c-8092-122f4493e0c7.woff

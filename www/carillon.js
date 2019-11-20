@@ -48,9 +48,9 @@ var update = function() {
 		var new_title;
 
 		if (data.live)
-			new_title = 'Clemson University Carillon - ' + data.title + ' (Live)';
+			new_title = 'CU Carillon - ' + data.title + ' (Live)';
 		else
-			new_title = 'Clemson University Carillon - ' + data.title;
+			new_title = 'CU Carillon - ' + data.title;
 
 		if (document.title !== new_title) {
 			document.title = new_title;
@@ -116,10 +116,17 @@ var load = function() {
 			}, false);
 
 			var playupdate = function() {
-				if (stream.paused)
+				if (stream.paused) {
 					play.innerText = 'Play';
-				else
+				}
+				else {
+					if (playinfo.style.display !== 'none')
+						playinfo.style.display = 'none';
+					if (playarrow.style.display !== 'none')
+						playarrow.style.display = 'none';
+
 					play.innerText = 'Pause';
+				}
 			};
 
 			stream.addEventListener('play', function() {
@@ -131,11 +138,6 @@ var load = function() {
 			}, false);
 
 			play.addEventListener('click', function(ev) {
-				if (playinfo.style.display !== 'none')
-					playinfo.style.display = 'none';
-				if (playarrow.style.display !== 'none')
-					playarrow.style.display = 'none';
-
 				if (stream.paused)
 					stream.play();
 				else
