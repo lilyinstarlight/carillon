@@ -44,7 +44,7 @@ if (Notification.permission !== 'granted' && Notification.permission !== 'denied
 	Notification.requestPermission();
 
 var update = function() {
-	xhr('get', 'details.json', null, function(data) {
+	xhr('get', 'metadata.json', null, function(data) {
 		var new_title;
 
 		if (data.live)

@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 app.use(express.static('www'));
 
 app.get('/metadata', function (req, res) {
-  fs.readFile(path.join(__dirname, '..', 'www', 'details.json'), function (err, data) {
+  fs.readFile(path.join(__dirname, '..', 'www', 'metadata.json'), function (err, data) {
     if (err) {
       console.error('Error reading file');
       res.status(500);
@@ -26,7 +26,7 @@ app.get('/metadata', function (req, res) {
 
 app.post('/metadata', function (req, res) {
   if ('title' in req.body && 'composer' in req.body && 'live' in req.body) {
-    fs.writeFile(path.join(__dirname, '..', 'www', 'details.json'), JSON.stringify({'title': req.body.title, 'composer': req.body.composer, 'live': req.body.live}), function (err) {
+    fs.writeFile(path.join(__dirname, '..', 'www', 'metadata.json'), JSON.stringify({'title': req.body.title, 'composer': req.body.composer, 'live': req.body.live}), function (err) {
       if (err) {
         console.error('Error updating file');
         res.status(500);
