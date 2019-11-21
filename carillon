@@ -18,8 +18,10 @@ class CarillonDisplay:
         self.update_button = urwid.Button('Update', self.update)
         self.clear_button = urwid.Button('Clear', self.clear)
         self.buttons = urwid.Columns([(10, self.update_button), urwid.Divider(), (9, self.clear_button)])
+        self.feedback = urwid.Text('', align='center')
+        self.feedback_timer = -1
 
-        self.pile = urwid.Pile([self.title, self.composer, self.live, urwid.Divider(), self.buttons])
+        self.pile = urwid.Pile([self.title, self.composer, self.live, urwid.Divider(), self.buttons, urwid.Divider(), self.feedback])
 
         self.loop = urwid.MainLoop(urwid.Filler(urwid.Padding(self.pile, width=40, align='center')))
 
@@ -27,6 +29,7 @@ class CarillonDisplay:
 
         self.running = True
         self.clear()
+        self.feedback_timer = 0
         self.refresh()
         self.running = False
 
@@ -48,6 +51,12 @@ class CarillonDisplay:
                 self.title.edit_text = data['title']
                 self.composer.edit_text = data['composer']
 
+        if self.feedback_timer == 0:
+            self.feedback.set_text('')
+
+        if self.feedback_timer >= 0:
+            self.feedback_timer -= 1
+
         if not self.running:
             raise urwid.ExitMainLoop()
 
@@ -56,6 +65,9 @@ class CarillonDisplay:
     def update(self, _=None):
         with open(os.path.dirname(__file__) + '/www/details.json', 'w') as file:
             file.write(json.dumps({'live': self.live.state, 'title': self.title.edit_text, 'composer': self.composer.edit_text}))
+
+        self.feedback.set_text('Stream metadata updated!')
+        self.feedback_timer = 3
 
     def clear(self, _=None):
         self.title.set_edit_text('None')
