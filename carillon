@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+import configparser
 import json
 import os
-import shlex
 import signal
 import subprocess
 import sys
@@ -67,7 +67,7 @@ class CarillonDisplay:
             file.write(json.dumps({'live': self.live.state, 'title': self.title.edit_text, 'composer': self.composer.edit_text}))
 
         self.feedback.set_text('Stream metadata updated!')
-        self.feedback_timer = 3
+        self.feedback_timer = 2
 
     def clear(self, _=None):
         self.title.set_edit_text('None')
@@ -80,49 +80,57 @@ class CarillonDisplay:
 os.chdir(os.path.dirname(__file__))
 
 
-nginx_cmd = ['/bin/sh', 'conf/nginx.sh']
-ffmpeg_cmd = ['/bin/sh', 'conf/ffmpeg.sh']
-update_cmd = ['/bin/sh', 'conf/upd.sh']
+http_cmd = [sys.executable, '-m', 'http.server', '-b', '127.0.0.1', '-d', 'www', '8080']
+ffmpeg_cmd = ['ffmpeg', '-f', 'avfoundation', '-i', ':0', '-c:a', 'mp3', '-map', '0', '-flags', '-global_header', '-f', 'hls', '-hls_flags', 'delete_segments+temp_file', '-hls_segment_filename', 'www/stream/stream.%03d.ts', 'www/stream/stream.m3u8']
+update_cmd = ['/bin/sh', '-c', 'cd upd && "{npm}" install && exec "{npm}" start -- -p "{port}" -a "{addr}"'.format(npm='npm', port='8081', addr='127.0.0.1')]
 
 
 if __name__ == '__main__':
-    try:
-        nginx = subprocess.Popen(nginx_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        ffmpeg = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        update = subprocess.Popen(update_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    with open('log/ffmpeg.out', 'a') as ffmpeg_out, open('log/upd.out', 'a') as update_out:
+        for file in [ffmpeg_out, update_out]:
+            print(file=file)
+            print('================', file=file)
+            print('Restarting Radio', file=file)
+            print('================', file=file)
+            print(file=file)
 
-        display = CarillonDisplay()
+        try:
+            http = subprocess.Popen(http_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            ffmpeg = subprocess.Popen(ffmpeg_cmd, stdout=ffmpeg_out, stderr=subprocess.STDOUT)
+            update = subprocess.Popen(update_cmd, stdout=update_out, stderr=subprocess.STDOUT)
 
-        signal.signal(signal.SIGINT, lambda signum, siginfo: display.exit())
-        signal.signal(signal.SIGTERM, lambda signum, siginfo: display.exit())
-        signal.signal(signal.SIGCHLD, lambda signum, siginfo: display.exit())
+            display = CarillonDisplay()
 
-        display.run()
-    finally:
-        try:
-            ret = nginx.poll()
-            if ret:
-                sys.stderr.write('nginx returned an error ({})\n'.format(ret))
-            else:
-                nginx.terminate()
-                nginx.wait()
-        except:
-            pass
-        try:
-            ret = ffmpeg.poll()
-            if ret and ret != 255:
-                sys.stderr.write('ffmpeg returned an error ({})\n'.format(ret))
-            else:
-                ffmpeg.terminate()
-                ffmpeg.wait()
-        except:
-            pass
-        try:
-            ret = update.poll()
-            if ret:
-                sys.stderr.write('updater returned an error ({})\n'.format(ret))
-            else:
-                update.terminate()
-                update.wait()
-        except:
-            pass
+            signal.signal(signal.SIGINT, lambda signum, siginfo: display.exit())
+            signal.signal(signal.SIGTERM, lambda signum, siginfo: display.exit())
+            signal.signal(signal.SIGCHLD, lambda signum, siginfo: display.exit())
+
+            display.run()
+        finally:
+            try:
+                ret = http.poll()
+                if ret:
+                    sys.stderr.write('web server returned an error ({})\n'.format(ret))
+                else:
+                    http.terminate()
+                    http.wait()
+            except Exception:
+                pass
+            try:
+                ret = ffmpeg.poll()
+                if ret and ret != 255:
+                    sys.stderr.write('ffmpeg returned an error ({})\n'.format(ret))
+                else:
+                    ffmpeg.terminate()
+                    ffmpeg.wait()
+            except Exception:
+                pass
+            try:
+                ret = update.poll()
+                if ret:
+                    sys.stderr.write('updater returned an error ({})\n'.format(ret))
+                else:
+                    update.terminate()
+                    update.wait()
+            except Exception:
+                pass

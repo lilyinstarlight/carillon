@@ -3,6 +3,23 @@ var fs = require('fs');
 
 var express = require('express');
 var bodyParser = require('body-parser');
+var yargs = require('yargs');
+
+var argv = yargs
+                .usage('Usage: $0 [-p <port>] [-a <address>]')
+                .alias('p', 'port')
+                .nargs('p', 1)
+                .number('p')
+                .default('p', 8081)
+                .describe('p', 'Bind port')
+                .alias('a', 'addr')
+                .nargs('a', 1)
+                .string('a')
+                .default('a', '127.0.0.1')
+                .describe('a', 'Bind address')
+                .help('h')
+                .alias('h', 'help')
+                .argv;
 
 var app = express();
 
@@ -41,6 +58,6 @@ app.post('/metadata', function (req, res) {
   }
 });
 
-app.listen(8070, function () {
+app.listen(argv.port, argv.addr, function () {
   console.log('Carillon updater running...');
 });
