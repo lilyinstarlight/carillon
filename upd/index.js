@@ -58,6 +58,6 @@ app.post('/metadata', function (req, res) {
   }
 });
 
-app.listen(argv.port, argv.addr, function () {
+app.listen(argv.port, argv.bind, function () {
   console.log('Carillon updater running...');
 });

@@ -84,24 +84,81 @@ config = configparser.ConfigParser()
 config.read('carillon.cfg')
 
 
-http_cmd = [sys.executable, '-m', 'http.server', '-b', config.get('http', 'bind', fallback='127.0.0.1'), '-d', 'www', config.get('http', 'port', fallback='8080')]
-ffmpeg_cmd = [config.get('ffmpeg', 'command_ffmpeg', fallback='ffmpeg'), '-f', config.get('ffmpeg', 'format', fallback='alsa'), '-i', config.get('ffmpeg', 'device', fallback='default'), '-c:a', 'mp3', '-map', '0', '-flags', '-global_header', '-f', 'hls', '-hls_flags', 'delete_segments+temp_file', '-hls_segment_filename', 'www/stream/stream.%03d.ts', 'www/stream/stream.m3u8']
-update_cmd = ['/bin/sh', '-c', 'cd upd && "{npm}" install && exec "{npm}" start -- -p "{port}" -b "{addr}"'.format(npm=config.get('updater', 'command_npm', fallback='npm'), port=config.get('updater', 'port', fallback='8081'), addr=config.get('updater', 'bind', fallback='127.0.0.1'))]
+components = {
+    'http': {
+        'name': 'web server',
+        'cmd': [sys.executable, '-m', 'http.server', '-b', config.get('http', 'bind', fallback='127.0.0.1'), config.get('http', 'port', fallback='8080')],
+        'cwd': 'www',
+        'log': 'log/http.out',
+    },
+    'ffmpeg': {
+        'name': 'ffmpeg',
+        'cmd': [config.get('ffmpeg', 'command_ffmpeg', fallback='ffmpeg'), '-f', config.get('ffmpeg', 'format', fallback='alsa'), '-i', config.get('ffmpeg', 'device', fallback='default'), '-c:a', 'mp3', '-map', '0', '-flags', '-global_header', '-f', 'hls', '-hls_flags', 'delete_segments+temp_file', '-hls_segment_filename', 'stream.%03d.ts', 'stream.m3u8'],
+        'ok': [0, 255],
+        'cwd': 'www/stream',
+        'log': 'log/ffmpeg.out',
+    },
+    'update': {
+        'name': 'updater',
+        'init': [config.get('updater', 'command_npm', fallback='npm'), 'install'],
+        'cmd': [config.get('updater', 'command_npm', fallback='npm'), 'start', '--', '-p', config.get('updater', 'port', fallback='8081'), '-b', config.get('updater', 'bind', fallback='127.0.0.1')],
+        'cwd': 'upd',
+        'log': 'log/upd.out',
+    },
+}
 
 
 if __name__ == '__main__':
-    with open('log/http.out', 'a') as http_out, open('log/ffmpeg.out', 'a') as ffmpeg_out, open('log/upd.out', 'a') as update_out:
-        for file in [http_out, ffmpeg_out, update_out]:
-            print(file=file)
-            print('================', file=file)
-            print('Restarting Radio', file=file)
-            print('================', file=file)
-            print(file=file)
+    logs = {}
+
+    try:
+        for component, spec in components.items():
+            logs[component] = open(spec['log'], 'a')
+
+        for log in logs.values():
+            print(file=log)
+            print('==============', file=log)
+            print('Starting Radio', file=log)
+            print('==============', file=log)
+            print(file=log)
+            log.flush()
+
+        init_procs = {}
 
         try:
-            http = subprocess.Popen(http_cmd, stdout=http_out, stderr=subprocess.STDOUT)
-            ffmpeg = subprocess.Popen(ffmpeg_cmd, stdout=ffmpeg_out, stderr=subprocess.STDOUT)
-            update = subprocess.Popen(update_cmd, stdout=update_out, stderr=subprocess.STDOUT)
+            for component, spec in components.items():
+                if 'init' in spec:
+                    init_procs[component] = subprocess.Popen(spec['init'], stdout=logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
+
+            for proc in init_procs.values():
+                proc.wait()
+
+            errors = []
+
+            for component, proc in init_procs.items():
+                ret = proc.poll()
+                if 'ok' in components[component]:
+                    if ret in components[component]['ok']:
+                        ret = 0
+                if ret:
+                    errors.append((components[component]['name'], ret, proc.args))
+
+            if errors:
+                raise RuntimeError('component initialization errors:\n\t' + '\n\t'.join('{} - (exit code: {}) {}'.format(name, ret, repr(cmd)) for name, ret, cmd in errors))
+        finally:
+            for proc in init_procs.values():
+                try:
+                    proc.terminate()
+                    proc.wait()
+                except Exception:
+                    pass
+
+        procs = {}
+
+        try:
+            for component, spec in components.items():
+                if 'cmd' in spec:
+                    procs[component] = subprocess.Popen(spec['cmd'], stdout=logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
 
             display = CarillonDisplay()
 
@@ -110,31 +167,29 @@ if __name__ == '__main__':
             signal.signal(signal.SIGCHLD, lambda signum, siginfo: display.exit())
 
             display.run()
+
+            errors = []
+
+            for component, proc in procs.items():
+                ret = proc.poll()
+                if 'ok' in components[component]:
+                    if ret in components[component]['ok']:
+                        ret = 0
+                if ret:
+                    errors.append((components[component]['name'], ret, proc.args))
+
+            if errors:
+                raise RuntimeError('component errors:\n\t' + '\n\t'.join('{} - (exit code: {}) {}'.format(name, ret, repr(cmd)) for name, ret, cmd in errors))
         finally:
+            for proc in procs.values():
+                try:
+                    proc.terminate()
+                    proc.wait()
+                except Exception:
+                    pass
+    finally:
+        for log in logs.values():
             try:
-                ret = http.poll()
-                if ret:
-                    sys.stderr.write('web server returned an error ({})\n'.format(ret))
-                else:
-                    http.terminate()
-                    http.wait()
-            except Exception:
-                pass
-            try:
-                ret = ffmpeg.poll()
-                if ret and ret != 255:
-                    sys.stderr.write('ffmpeg returned an error ({})\n'.format(ret))
-                else:
-                    ffmpeg.terminate()
-                    ffmpeg.wait()
-            except Exception:
-                pass
-            try:
-                ret = update.poll()
-                if ret:
-                    sys.stderr.write('updater returned an error ({})\n'.format(ret))
-                else:
-                    update.terminate()
-                    update.wait()
+                log.close()
             except Exception:
                 pass
