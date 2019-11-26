@@ -41,11 +41,11 @@ class CarillonDisplay:
         self.running = False
 
     def refresh(self, _=None, __=None):
-        mtime = os.stat(os.path.dirname(__file__) + '/www/stream/metadata.json').st_mtime
+        mtime = os.stat('www/stream/metadata.json').st_mtime
         if mtime > self.last_mtime:
             self.last_mtime = mtime
 
-            with open(os.path.dirname(__file__) + '/www/stream/metadata.json', 'r') as file:
+            with open('www/stream/metadata.json', 'r') as file:
                 data = json.loads(file.read())
                 self.live.state = data['live']
                 self.title.edit_text = data['title']
@@ -63,7 +63,7 @@ class CarillonDisplay:
         self.loop.set_alarm_in(1, self.refresh)
 
     def update(self, _=None):
-        with open(os.path.dirname(__file__) + '/www/stream/metadata.json', 'w') as file:
+        with open('www/stream/metadata.json', 'w') as file:
             file.write(json.dumps({'live': self.live.state, 'title': self.title.edit_text, 'composer': self.composer.edit_text}))
 
         self.feedback.set_text('Stream metadata updated!')
