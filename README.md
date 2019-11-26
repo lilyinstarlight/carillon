@@ -10,7 +10,6 @@ Requirements
 * Python 3
 * Urwid (Python 3)
 * Node.js
-* Nginx
 * FFmpeg
 
 
