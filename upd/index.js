@@ -6,17 +6,17 @@ var bodyParser = require('body-parser');
 var yargs = require('yargs');
 
 var argv = yargs
-                .usage('Usage: $0 [-p <port>] [-a <address>]')
+                .usage('Usage: $0 [-p <port>] [-b <address>]')
                 .alias('p', 'port')
                 .nargs('p', 1)
                 .number('p')
                 .default('p', 8081)
                 .describe('p', 'Bind port')
-                .alias('a', 'addr')
-                .nargs('a', 1)
-                .string('a')
-                .default('a', '127.0.0.1')
-                .describe('a', 'Bind address')
+                .alias('b', 'bind')
+                .nargs('b', 1)
+                .string('b')
+                .default('b', '127.0.0.1')
+                .describe('b', 'Bind address')
                 .help('h')
                 .alias('h', 'help')
                 .argv;
