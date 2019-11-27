@@ -60,8 +60,12 @@ downloads = {
 os.chdir(os.path.dirname(__file__))
 
 
-for directory, files in downloads:
+for directory, files in downloads.items():
+    print('Directory: {}'.format(directory))
+
     for url in files:
+        print('\tURL: {}'.format(url))
+
         filename = os.path.basename(urllib.parse.urlparse(url).path)
 
         with urllib.request.urlopen(url) as conn, open(os.path.join(directory, filename), 'wb') as file:
@@ -70,3 +74,5 @@ for directory, files in downloads:
                 if not block:
                     break
                 file.write(block)
+
+    print()
