@@ -1,8 +1,6 @@
 /log/*
-/run/*
-/tmp/*
 
-/www/details.json
+/www/stream/metadata.json
 /www/stream/stream.*
 
 /www/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg
