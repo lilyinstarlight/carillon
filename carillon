@@ -125,7 +125,7 @@ class Phase:
                         if callable(spec[self.phase]):
                             try:
                                 spec[self.phase]()
-                            except Exception as e:
+                            except Exception:
                                 import traceback
                                 self.logs[component].write(traceback.format_exc())
                                 self.logs[component].flush()
