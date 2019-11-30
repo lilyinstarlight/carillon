@@ -2,14 +2,14 @@
 import configparser
 import json
 import os
+import re
 import signal
 import subprocess
-import sys
 
 import urwid
 
 
-class CarillonDisplay:
+class Display:
     def __init__(self):
         self.title = urwid.Edit('Title: ')
         self.composer = urwid.Edit('Composer: ')
@@ -27,18 +27,17 @@ class CarillonDisplay:
 
         self.last_mtime = 0
 
-        self.running = True
+        self.exiting = False
+
         self.clear()
         self.feedback_timer = 0
         self.refresh()
-        self.running = False
 
     def run(self):
-        self.running = True
         self.loop.run()
 
     def exit(self):
-        self.running = False
+        self.exiting = True
 
     def refresh(self, _=None, __=None):
         mtime = os.stat('www/stream/metadata.json').st_mtime
@@ -57,7 +56,7 @@ class CarillonDisplay:
         if self.feedback_timer >= 0:
             self.feedback_timer -= 1
 
-        if not self.running:
+        if self.exiting:
             raise urwid.ExitMainLoop()
 
         self.loop.set_alarm_in(1, self.refresh)
@@ -77,45 +76,17 @@ class CarillonDisplay:
         self.update(_)
 
 
-os.chdir(os.path.dirname(__file__))
+class Logs:
+    def __init__(self, components):
+        self.components = components
 
+        self.logs = {}
 
-config = configparser.ConfigParser()
-config.read('carillon.cfg')
+    def __enter__(self):
+        for component, spec in self.components.items():
+            self.logs[component] = open(spec['log'], 'a')
 
-
-components = {
-    'http': {
-        'name': 'web server',
-        'cmd': [sys.executable, '-m', 'http.server', '-b', config.get('http', 'bind', fallback='127.0.0.1'), config.get('http', 'port', fallback='8080')],
-        'cwd': 'www',
-        'log': 'log/http.out',
-    },
-    'ffmpeg': {
-        'name': 'ffmpeg',
-        'cmd': [config.get('ffmpeg', 'command_ffmpeg', fallback='ffmpeg'), '-f', config.get('ffmpeg', 'format', fallback='alsa'), '-i', config.get('ffmpeg', 'device', fallback='default'), '-c:a', 'mp3', '-map', '0', '-flags', '-global_header', '-f', 'hls', '-hls_flags', 'delete_segments+temp_file', '-hls_segment_filename', 'stream.%03d.ts', 'stream.m3u8'],
-        'ok': [0, 255],
-        'cwd': 'www/stream',
-        'log': 'log/ffmpeg.out',
-    },
-    'update': {
-        'name': 'updater',
-        'init': [config.get('updater', 'command_npm', fallback='npm'), 'install'],
-        'cmd': [config.get('updater', 'command_npm', fallback='npm'), 'start', '--', '-p', config.get('updater', 'port', fallback='8081'), '-b', config.get('updater', 'bind', fallback='127.0.0.1')],
-        'cwd': 'upd',
-        'log': 'log/upd.out',
-    },
-}
-
-
-if __name__ == '__main__':
-    logs = {}
-
-    try:
-        for component, spec in components.items():
-            logs[component] = open(spec['log'], 'a')
-
-        for log in logs.values():
+        for log in self.logs.values():
             print(file=log)
             print('==============', file=log)
             print('Starting Radio', file=log)
@@ -123,73 +94,202 @@ if __name__ == '__main__':
             print(file=log)
             log.flush()
 
-        init_procs = {}
+        return self.logs
 
-        try:
-            for component, spec in components.items():
-                if 'init' in spec:
-                    init_procs[component] = subprocess.Popen(spec['init'], stdout=logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
+    def __exit__(self, _, __, ___):
+        for log in self.logs.values():
+            try:
+                log.close()
+            except Exception:
+                pass
 
-            for proc in init_procs.values():
-                proc.wait()
+
+class Phase:
+    class Manager:
+        def __init__(self, phase):
+            self.components = phase.components
+            self.logs = phase.logs
+            self.phase = phase.phase
+
+            self.runtime = {}
+
+        def start(self):
+            try:
+                for component, spec in self.components.items():
+                    if self.phase in spec:
+                        self.runtime[component] = {
+                            'proc': None,
+                            'errors': [],
+                        }
+
+                        if callable(spec[self.phase]):
+                            try:
+                                spec[self.phase]()
+                            except Exception as e:
+                                import traceback
+                                self.logs[component].write(traceback.format_exc())
+                                self.logs[component].flush()
+                                self.runtime[component]['errors'].append(('(<function>)', spec[self.phase].__name__))
+                        elif isinstance(spec[self.phase], list):
+                            self.runtime[component]['proc'] = subprocess.Popen(spec[self.phase], stdout=self.logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
+                        elif isinstance(spec[self.phase], str):
+                            self.runtime[component]['proc'] = subprocess.Popen(spec[self.phase], shell=True, stdout=self.logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
+                        else:
+                            raise TypeError('{} in component {} must be callable, list, or str'.format(repr(self.phase), repr(component)))
+            except Exception:
+                self.terminate()
+                raise
+
+        def wait(self):
+            for data in self.runtime.values():
+                if data['proc']:
+                    data['proc'].wait()
+
+        def gather(self):
+            for component, data in self.runtime.items():
+                if data['proc']:
+                    ret = data['proc'].poll()
+                    if 'ok' in self.components[component]:
+                        if ret in self.components[component]['ok']:
+                            ret = 0
+                    if ret:
+                        data['errors'].append(('(exit code: {})'.format(ret), data['proc'].args))
 
             errors = []
 
-            for component, proc in init_procs.items():
-                ret = proc.poll()
-                if 'ok' in components[component]:
-                    if ret in components[component]['ok']:
-                        ret = 0
-                if ret:
-                    errors.append((components[component]['name'], ret, proc.args))
+            for component, data in self.runtime.items():
+                errors.extend([(self.components[component]['name'], *error) for error in data['errors']])
 
             if errors:
-                raise RuntimeError('component initialization errors:\n\t' + '\n\t'.join('{} - (exit code: {}) {}'.format(name, ret, repr(cmd)) for name, ret, cmd in errors))
-        finally:
-            for proc in init_procs.values():
+                raise RuntimeError('component errors in phase {}:\n\t'.format(repr(self.phase)) + '\n\t'.join('{} - {} {}'.format(name, ret, repr(cmd)) for name, ret, cmd in errors))
+
+        def terminate(self):
+            for data in self.runtime.values():
                 try:
-                    proc.terminate()
-                    proc.wait()
+                    data['proc'].terminate()
+                    data['proc'].wait()
                 except Exception:
                     pass
 
-        procs = {}
+        def run(self):
+            self.start()
+            self.wait()
+            self.gather()
+
+    def __init__(self, components, logs, phase):
+        self.components = components
+        self.logs = logs
+        self.phase = phase
+
+        self.manager = None
+
+    def __enter__(self):
+        self.manager = Phase.Manager(self)
+        return self.manager
+
+    def __exit__(self, _, __, ___):
+        if self.manager:
+            self.manager.terminate()
+
+
+os.chdir(os.path.dirname(__file__))
+
+
+config = configparser.ConfigParser()
+config.read('conf/default.cfg')
+config.read('carillon.cfg')
+
+
+def caddy_generate():
+    with open('conf/Caddyfile.in', 'r') as caddy_in, open('run/Caddyfile', 'w') as caddy_out:
+        caddy_lines = []
+        skip = None
+        for line in caddy_in:
+            fold = re.match(r'%%([A-Z0-9_]*)_(BEGIN|END)%%', line.strip())
+            if fold:
+                if fold.group(2) == 'END':
+                    if fold.group(1) == skip:
+                        skip = None
+                    continue
+                elif fold.group(2) == 'BEGIN':
+                    if fold.group(1) == 'TLS':
+                        if config['http']['tls'] == 'off':
+                            skip = 'TLS'
+                        continue
+                    if fold.group(1) == 'UPDATE':
+                        if not config['http']['allow_update'] or config['http']['allow_update'] == 'none':
+                            skip = 'UPDATE'
+                        continue
+
+            if skip:
+                continue
+
+            line = line.replace('%BIND%', config['http']['bind'])
+            line = line.replace('%OPTIONAL_HTTP_PORT%', ':' + config['http']['http_port'] if config['http']['http_port'] != '80' else '')
+            line = line.replace('%OPTIONAL_HTTPS_PORT%', ':' + config['http']['https_port'] if config['http']['https_port'] != '443' else '')
+            line = line.replace('%HOST%', config['http']['host'])
+            line = line.replace('%TLS%', config['http']['tls'])
+
+            line = line.replace('%ALLOW_UPDATE%', config['http']['allow_update'])
+
+            line = line.replace('%UPDATER_BIND%', config['updater']['bind'])
+            line = line.replace('%UPDATER_PORT%', config['updater']['port'])
+
+            line = line.replace('%UPDATER_BASE%', config['updater']['base'])
+
+            caddy_lines.append(line)
+
+        caddy_out.write(''.join(caddy_lines))
+
+
+components = {
+    'http': {
+        'name': 'web server',
+        'pre': caddy_generate,
+        'cmd': [config['http']['command_caddy'], '-conf', 'run/Caddyfile'],
+        'cwd': None,
+        'log': 'log/http.out',
+    },
+    'ffmpeg': {
+        'name': 'ffmpeg',
+        'cmd': [config['ffmpeg']['command_ffmpeg'], '-f', config['ffmpeg']['format'], '-i', config['ffmpeg']['device'], '-c:a', 'mp3', '-map', '0', '-flags', '-global_header', '-f', 'hls', '-hls_flags', 'delete_segments+temp_file', '-hls_segment_filename', 'stream.%03d.ts', 'stream.m3u8'],
+        'ok': [0, 255],
+        'cwd': 'www/stream',
+        'log': 'log/ffmpeg.out',
+    },
+    'update': {
+        'name': 'updater',
+        'pre': [config['updater']['command_npm'], 'install'],
+        'cmd': [config['updater']['command_npm'], 'start', '--', '-p', config['updater']['port'], '-a', config['updater']['bind'], '-r', config['updater']['proxy'], '-b', config['updater']['base']],
+        'cwd': 'upd',
+        'log': 'log/upd.out',
+    },
+}
+
+
+def main():
+    with Logs(components) as logs, Phase(components, logs, 'pre') as pre, Phase(components, logs, 'cmd') as cmd, Phase(components, logs, 'setup') as setup, Phase(components, logs, 'post') as post:
+        pre.run()
 
         try:
-            for component, spec in components.items():
-                if 'cmd' in spec:
-                    procs[component] = subprocess.Popen(spec['cmd'], stdout=logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
-
-            display = CarillonDisplay()
+            display = Display()
 
             signal.signal(signal.SIGINT, lambda signum, siginfo: display.exit())
             signal.signal(signal.SIGTERM, lambda signum, siginfo: display.exit())
             signal.signal(signal.SIGCHLD, lambda signum, siginfo: display.exit())
 
+            cmd.start()
+
+            setup.run()
+
             display.run()
 
-            errors = []
-
-            for component, proc in procs.items():
-                ret = proc.poll()
-                if 'ok' in components[component]:
-                    if ret in components[component]['ok']:
-                        ret = 0
-                if ret:
-                    errors.append((components[component]['name'], ret, proc.args))
-
-            if errors:
-                raise RuntimeError('component errors:\n\t' + '\n\t'.join('{} - (exit code: {}) {}'.format(name, ret, repr(cmd)) for name, ret, cmd in errors))
+            cmd.gather()
         finally:
-            for proc in procs.values():
-                try:
-                    proc.terminate()
-                    proc.wait()
-                except Exception:
-                    pass
-    finally:
-        for log in logs.values():
-            try:
-                log.close()
-            except Exception:
-                pass
+            cmd.terminate()
+
+        post.run()
+
+
+if __name__ == '__main__':
+    main()

@@ -12,22 +12,31 @@ var argv = yargs
                 .number('p')
                 .default('p', 8081)
                 .describe('p', 'Bind port')
-                .alias('b', 'bind')
+                .alias('a', 'addr')
+                .nargs('a', 1)
+                .string('a')
+                .default('a', '127.0.0.1')
+                .describe('a', 'Bind address')
+                .alias('b', 'base')
                 .nargs('b', 1)
                 .string('b')
-                .default('b', '127.0.0.1')
-                .describe('b', 'Bind address')
+                .default('b', '/')
+                .describe('b', 'Base path')
+                .alias('r', 'proxy')
+                .nargs('r', 1)
+                .string('r')
+                .default('r', null)
+                .describe('r', 'Reverse proxy server address(es)')
                 .help('h')
                 .alias('h', 'help')
                 .argv;
 
 var app = express();
+var router = express.Router();
 
-app.use(bodyParser.json());
+router.use(express.static('www'));
 
-app.use(express.static('www'));
-
-app.get('/metadata', function (req, res) {
+router.get('/metadata', function (req, res) {
   fs.readFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), function (err, data) {
     if (err) {
       console.error('Error reading file');
@@ -41,7 +50,7 @@ app.get('/metadata', function (req, res) {
   });
 });
 
-app.post('/metadata', function (req, res) {
+router.post('/metadata', bodyParser.json(), function (req, res) {
   if ('title' in req.body && 'composer' in req.body && 'live' in req.body) {
     fs.writeFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), JSON.stringify({'title': req.body.title, 'composer': req.body.composer, 'live': req.body.live}), function (err) {
       if (err) {
@@ -58,6 +67,10 @@ app.post('/metadata', function (req, res) {
   }
 });
 
-app.listen(argv.port, argv.bind, function () {
+app.use(argv.base, router);
+if (argv.proxy)
+  app.set('trust proxy', argv.proxy);
+
+app.listen(argv.port, argv.addr, function () {
   console.log('Carillon updater running...');
 });

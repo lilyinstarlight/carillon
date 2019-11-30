@@ -1,0 +1,43 @@
+(radio) {
+	tls %TLS%
+
+	root www
+
+	log / stdout "{combined}"
+
+	gzip {
+		not /stream
+	}
+%%TLS_BEGIN%%
+
+redir 301 {
+	if {scheme} is http
+	/  https://%HOST%%OPTIONAL_HTTPS_PORT%{uri}
+}
+%%TLS_END%%
+%%UPDATE_BEGIN%%
+
+	proxy %UPDATER_BASE% http://%UPDATER_BIND%:%UPDATER_PORT% {
+		transparent
+	}
+
+	ipfilter %UPDATER_BASE% {
+		rule allow
+		ip %ALLOW_UPDATE%
+	}
+%%UPDATE_END%%
+}
+
+http://%HOST%%OPTIONAL_HTTP_PORT% {
+	bind %BIND%
+
+	import radio
+}
+%%TLS_BEGIN%%
+
+https://%HOST%%OPTIONAL_HTTPS_PORT% {
+	bind %BIND%
+
+	import radio
+}
+%%TLS_END%%

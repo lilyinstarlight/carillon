@@ -1,4 +1,5 @@
 /log/*
+/run/*
 
 /www/stream/metadata.json
 /www/stream/stream.*
@@ -46,3 +47,5 @@
 /upd/www/d5ea405c-2180-4ff0-bd51-3e19fb280be4.ttf
 /upd/www/e741f29c-bc18-4343-bff3-db2465a0be3e.ttf
 /upd/www/white-purple.png
+
+/carillon.cfg

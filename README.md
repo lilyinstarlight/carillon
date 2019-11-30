@@ -11,6 +11,7 @@ Requirements
 * Urwid (Python 3)
 * Node.js
 * FFmpeg
+* Caddy (v1 with http.ipfilter plugin if filtering update interface)
 
 
 Setup
