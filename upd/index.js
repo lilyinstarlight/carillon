@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 var yargs = require('yargs');
 
 var argv = yargs
-                .usage('Usage: $0 [-p <port>] [-b <address>]')
+                .usage('Usage: $0 [-p <port>] [-a <address>] [-b <base>] [-r <proxy address>]')
                 .alias('p', 'port')
                 .nargs('p', 1)
                 .number('p')
