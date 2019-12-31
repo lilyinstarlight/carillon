@@ -47,23 +47,28 @@ var update = function() {
 	xhr('get', 'stream/metadata.json', null, function(data) {
 		var new_title;
 
-		if (data.live)
-			new_title = 'CU Carillon - ' + data.title + ' (Live)';
-		else
-			new_title = 'CU Carillon - ' + data.title;
+		new_title = 'CU Carillon - ' + data.title + (data.live ? ' (Live)' : '');
 
 		if (document.title !== new_title) {
 			document.title = new_title;
 			notify(new_title);
 		}
 
-		if (data.live)
-			playing.innerText = 'Now Playing (Live):'
-		else
-			playing.innerText = 'Now Playing:'
+		playing.innerText = data.live ? 'Now Playing (Live):' : 'Now Playing:';
 
 		title.innerText = data.title;
 		composer.innerText = data.composer;
+
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: data.title,
+				artist: data.composer,
+				album: data.live ? 'CU Carillon (Live)' : 'CU Carillon',
+				artwork: [
+					{ src: 'icon.png', sizes: '1024x1024', type: 'image/png' },
+				]
+			});
+		}
 	});
 
 	setTimeout(update, 1000);
