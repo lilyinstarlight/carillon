@@ -8,15 +8,20 @@
 	gzip {
 		not /stream
 	}
+
 header /stream {
-	Cache-Control: "public, max-age=7"
+	Cache-Control "max-age=12, public"
 	}
-header /stream/stream.m3u8{
-	Cache-Control: "no-cache"
+
+header /stream/stream.m3u8 {
+	Cache-Control "no-cache"
 	}
-header /stream/metadata.json{
-	Cache-Control: "no-cache"
+
+header /stream/metadata.json {
+	Cache-Control "no-cache"
 	}
+
+
 %%TLS_BEGIN%%
 
 	redir 301 {
