@@ -9,18 +9,12 @@
 		not /stream
 	}
 
-header /stream {
-	Cache-Control "max-age=12, public"
-	}
+	header /stream/stream. Cache-Control "public, max-age=12"
 
-header /stream/stream.m3u8 {
-	Cache-Control "no-cache"
-	}
+	header /stream/stream.m3u8	Cache-Control "no-cache"
 
-header /stream/metadata.json {
-	Cache-Control "no-cache"
-	}
-
+	header /stream/metadata.json	Cache-Control "no-cache"
+	
 
 %%TLS_BEGIN%%
 
