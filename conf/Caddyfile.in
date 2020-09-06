@@ -1,34 +1,47 @@
-(radio) {
-	tls %TLS%
+{
+	admin off
+	auto_https off
+}
 
+(radio) {
 	root www
 
-	log / stdout "{combined}"
-
-	header /stream/stream. Cache-Control "public, max-age=12"
-	header /stream/stream.m3u8 Cache-Control "no-cache"
-	header /stream/metadata.json Cache-Control "no-cache"
-
-	gzip {
-		not /stream
+	log {
+		output stdout
+		format single_field combined_log
 	}
+
+	file_server
+
+	header /stream/metadata.json Cache-Control "no-cache"
+	header /stream/stream.m3u8 Cache-Control "no-cache"
+	header /stream/stream.*.ts Cache-Control "public, max-age=12"
+
+	@static {
+		not path /stream/*
+	}
+
+	encode @static gzip
 %%TLS_BEGIN%%
 
-	redir 301 {
-		if {scheme} is http
-		/  https://%HOST%%OPTIONAL_HTTPS_PORT%{uri}
+	@http {
+		protocol http
 	}
+
+	redir @http https://localhost:8443{uri} permanent
 %%TLS_END%%
 %%UPDATE_BEGIN%%
 
-	proxy %UPDATER_BASE% http://%UPDATER_BIND%:%UPDATER_PORT% {
-		transparent
+	@ipfilter {
+		not remote_ip %ALLOW_UPDATE%
 	}
 
-	ipfilter %UPDATER_BASE% {
-		rule allow
-		ip %ALLOW_UPDATE%
+	route %UPDATER_BASE%/* {
+		respond @ipfilter 403
+		reverse_proxy http://%UPDATER_BIND%:%UPDATER_PORT%
 	}
+
+	redir %UPDATER_BASE% %UPDATER_BASE%/ permanent
 %%UPDATE_END%%
 }
 
@@ -41,6 +54,8 @@ http://%HOST%%OPTIONAL_HTTP_PORT% {
 
 https://%HOST%%OPTIONAL_HTTPS_PORT% {
 	bind %BIND%
+
+	tls %TLS%
 
 	import radio
 }

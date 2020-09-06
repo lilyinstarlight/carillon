@@ -246,7 +246,7 @@ components = {
     'http': {
         'name': 'web server',
         'pre': caddy_generate,
-        'cmd': [config['http']['command_caddy'], '-conf', 'run/Caddyfile'],
+        'cmd': [config['http']['command_caddy'], 'run', '--config', 'run/Caddyfile'],
         'cwd': None,
         'log': 'log/http.out',
     },
