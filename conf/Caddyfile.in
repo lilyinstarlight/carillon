@@ -8,7 +8,7 @@
 
 	log {
 		output stdout
-		format single_field combined_log
+		format single_field common_log
 	}
 
 	file_server
