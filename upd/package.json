@@ -1,7 +1,7 @@
 {
   "name": "carillon",
   "version": "0.3.0",
-  "description": "Carillon interface for Clemson's Memorial Carillon",
+  "description": "Radio update interface for Clemson University Carillon",
   "homepage": "https://github.com/lilyinstarlight/carillon",
   "scripts": {
     "start": "node index.js"
