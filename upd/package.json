@@ -1,19 +1,24 @@
 {
   "name": "carillon",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Carillon interface for Clemson's Memorial Carillon",
-  "homepage": "https://github.com/fkmclane/carillon",
+  "homepage": "https://github.com/lilyinstarlight/carillon",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "yargs": "^15.0.2"
+    "yargs": "^15.4.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fkmclane/carillon.git"
+    "url": "https://github.com/lilyinstarlight/carillon.git"
+  },
+  "author": {
+    "name": "Lily Foster",
+    "email": "lily@lily.flowers",
+    "url": "https://lily.flowers/"
   },
   "license": "MIT"
 }
