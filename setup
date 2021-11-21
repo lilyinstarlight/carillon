@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
+import configparser
 import os
 import os.path
+import subprocess
 import urllib.parse
 import urllib.request
+
+
+os.chdir(os.path.dirname(__file__))
+
+
+config = configparser.ConfigParser()
+config.read('conf/default.cfg')
+config.read('carillon.cfg')
 
 
 downloads = {
@@ -26,13 +36,14 @@ downloads = {
 
         'https://www.clemson.edu/brand/resources/logos/wordmark-academic/white-purple.png',
 
-        'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.slim.min.js',
 
-        'https://cdn.jsdelivr.net/npm/hls.js@0.14.11/dist/hls.min.js',
-        'https://cdn.jsdelivr.net/npm/hls.js@0.14.11/dist/hls.min.js.map',
+        'https://cdn.jsdelivr.net/npm/hls.js@1.1.1/dist/hls.min.js',
+        'https://cdn.jsdelivr.net/npm/hls.js@1.1.1/dist/hls.min.js.map',
 
-        'https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelementplayer.min.css',
-        'https://cdn.jsdelivr.net/npm/mediaelement@4.2.16/build/mediaelement-and-player.min.js',
+        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.4/build/mediaelementplayer.min.css',
+        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.4/build/mediaelement-and-player.min.js',
+        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.4/build/mejs-controls.svg',
     ],
     'upd/www': [
         'https://www.clemson.edu/_template-assets/1889/fonts/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg',
@@ -57,14 +68,11 @@ downloads = {
 }
 
 
-os.chdir(os.path.dirname(__file__))
-
-
 for directory, files in downloads.items():
-    print('Directory: {}'.format(directory))
+    print(f'Directory: {directory}')
 
     for url in files:
-        print('\tURL: {}'.format(url))
+        print(f'\tDownload: {url}')
 
         filename = os.path.basename(urllib.parse.urlparse(url).path)
 
@@ -76,3 +84,7 @@ for directory, files in downloads.items():
                 file.write(block)
 
     print()
+
+print('Directory: upd')
+print('\tRun: npm install')
+subprocess.run([config['updater']['command_npm'], 'install'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd='upd', check=True)

@@ -11,12 +11,12 @@ var playinfo = null;
 var playarrow = null;
 var stream = null;
 
-var xhr = function(method, resource, data, callback) {
+var xhr = (method, resource, data, callback) => {
 	var req = new XMLHttpRequest();
 
 	req.responseType = 'json';
 
-	req.addEventListener('load', function(ev) {
+	req.addEventListener('load', (ev) => {
 		callback === undefined || callback(req.response);
 	});
 
@@ -30,7 +30,7 @@ var xhr = function(method, resource, data, callback) {
 	}
 };
 
-var notify = function(title) {
+var notify = (title) => {
 	if (document.hasFocus())
 		return;
 
@@ -43,8 +43,8 @@ var notify = function(title) {
 if (Notification.permission !== 'granted' && Notification.permission !== 'denied')
 	Notification.requestPermission();
 
-var update = function() {
-	xhr('get', 'stream/metadata.json', null, function(data) {
+var update = () => {
+	xhr('get', 'stream/metadata.json', null, (data) => {
 		var new_title;
 
 		new_title = 'CU Carillon - ' + data.title + (data.live ? ' (Live)' : '');
@@ -74,7 +74,7 @@ var update = function() {
 	setTimeout(update, 1000);
 };
 
-var load = function() {
+var load = () => {
 	playing = document.getElementById('playing');
 	metadata = document.getElementById('metadata');
 	title = document.getElementById('title');
@@ -89,18 +89,19 @@ var load = function() {
 	stream = document.getElementById('stream');
 
 	var player = new MediaElementPlayer(document.getElementById('stream'), {
+		renderers: ['native_hls'],
 		features: [],
-		success: function(media, node, player) {
+		success: (media, node, player) => {
 			stream = media;
 
 			var volume = 0.5;
 
-			var volupdate = function() {
+			var volupdate = () => {
 				stream.volume = volume;
 				vol.innerText = stream.volume.toFixed(1);
 			};
 
-			voldown.addEventListener('click', function(ev) {
+			voldown.addEventListener('click', (ev) => {
 				volume -= 0.1;
 				if (volume <= 0)
 					volume = 0;
@@ -110,7 +111,7 @@ var load = function() {
 				ev.preventDefault();
 			}, false);
 
-			volup.addEventListener('click', function(ev) {
+			volup.addEventListener('click', (ev) => {
 				volume += 0.1;
 				if (volume >= 1)
 					volume = 1;
@@ -120,7 +121,7 @@ var load = function() {
 				ev.preventDefault();
 			}, false);
 
-			var playupdate = function() {
+			var playupdate = () => {
 				if (stream.paused) {
 					play.innerText = 'Play';
 				}
@@ -134,15 +135,15 @@ var load = function() {
 				}
 			};
 
-			stream.addEventListener('play', function() {
+			stream.addEventListener('play', () => {
 				playupdate();
 			}, false);
 
-			stream.addEventListener('pause', function() {
+			stream.addEventListener('pause', () => {
 				playupdate();
 			}, false);
 
-			play.addEventListener('click', function(ev) {
+			play.addEventListener('click', (ev) => {
 				if (stream.paused)
 					stream.play();
 				else

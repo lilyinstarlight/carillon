@@ -135,7 +135,7 @@ class Phase:
                         elif isinstance(spec[self.phase], str):
                             self.runtime[component]['proc'] = subprocess.Popen(spec[self.phase], shell=True, stdout=self.logs[component], stderr=subprocess.STDOUT, cwd=spec['cwd'])
                         else:
-                            raise TypeError('{} in component {} must be callable, list, or str'.format(repr(self.phase), repr(component)))
+                            raise TypeError(f'{self.phase!r} in component {component!r} must be callable, list, or str')
             except Exception:
                 self.terminate()
                 raise
@@ -153,7 +153,7 @@ class Phase:
                         if ret in self.components[component]['ok']:
                             ret = 0
                     if ret:
-                        data['errors'].append(('(exit code: {})'.format(ret), data['proc'].args))
+                        data['errors'].append((f'(exit code: {ret})', data['proc'].args))
 
             errors = []
 
@@ -161,7 +161,7 @@ class Phase:
                 errors.extend([(self.components[component]['name'], *error) for error in data['errors']])
 
             if errors:
-                raise RuntimeError('component errors in phase {}:\n\t'.format(repr(self.phase)) + '\n\t'.join('{} - {} {}'.format(name, ret, repr(cmd)) for name, ret, cmd in errors))
+                raise RuntimeError(f'component errors in phase {self.phase!r}:\n\t' + '\n\t'.join(f'{name} - {ret} {cmd!r}' for name, ret, cmd in errors))
 
         def terminate(self):
             for data in self.runtime.values():
@@ -259,8 +259,8 @@ components = {
     },
     'update': {
         'name': 'updater',
-        'pre': [config['updater']['command_npm'], 'install'],
         'cmd': [config['updater']['command_npm'], 'start', '--', '-p', config['updater']['port'], '-a', config['updater']['bind'], '-r', config['updater']['proxy'], '-b', config['updater']['base']],
+        'ok': [0, 130, -2],
         'cwd': 'upd',
         'log': 'log/upd.out',
     },

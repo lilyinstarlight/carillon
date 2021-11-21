@@ -36,8 +36,8 @@ var router = express.Router();
 
 router.use(express.static('www'));
 
-router.get('/metadata', function (req, res) {
-  fs.readFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), function (err, data) {
+router.get('/metadata', (req, res) => {
+  fs.readFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), (err, data) => {
     if (err) {
       console.error('Error reading file');
       res.status(500);
@@ -50,9 +50,9 @@ router.get('/metadata', function (req, res) {
   });
 });
 
-router.post('/metadata', bodyParser.json(), function (req, res) {
+router.post('/metadata', bodyParser.json(), (req, res) => {
   if ('title' in req.body && 'composer' in req.body && 'live' in req.body) {
-    fs.writeFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), JSON.stringify({'title': req.body.title, 'composer': req.body.composer, 'live': req.body.live}), function (err) {
+    fs.writeFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), JSON.stringify({'title': req.body.title, 'composer': req.body.composer, 'live': req.body.live}), (err) => {
       if (err) {
         console.error('Error updating file');
         res.status(500);
@@ -71,6 +71,6 @@ app.use(argv.base, router);
 if (argv.proxy)
   app.set('trust proxy', argv.proxy);
 
-app.listen(argv.port, argv.addr, function () {
+app.listen(argv.port, argv.addr, () => {
   console.log('Carillon updater running...');
 });

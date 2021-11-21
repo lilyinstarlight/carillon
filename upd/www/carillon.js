@@ -7,12 +7,12 @@ var feedback = null;
 var last = {'title': null, 'composer': null, 'live': null};
 var timeout = null;
 
-var xhr = function(method, resource, data, callback) {
+var xhr = (method, resource, data, callback) => {
 	var req = new XMLHttpRequest();
 
 	req.responseType = 'json';
 
-	req.addEventListener('load', function(ev) {
+	req.addEventListener('load', (ev) => {
 		callback === undefined || callback(req.response);
 	});
 
@@ -26,8 +26,8 @@ var xhr = function(method, resource, data, callback) {
 	}
 };
 
-var refresh = function() {
-	xhr('get', 'metadata', null, function(data) {
+var refresh = () => {
+	xhr('get', 'metadata', null, (data) => {
 		if (data['title'] !== last['title']) {
 			title.value = data['title'];
 			last['title'] = data['title'];
@@ -47,19 +47,19 @@ var refresh = function() {
 	});
 };
 
-var send = function() {
-	xhr('post', 'metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked}, function(response) {
+var send = () => {
+	xhr('post', 'metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked}, (response) => {
 		feedback.style.display = 'initial';
 		if (timeout)
 			clearTimeout(timeout);
-		timeout = setTimeout(function() {
+		timeout = setTimeout(() => {
 			feedback.style.display = 'none';
 			timeout = null;
 		}, 3000);
 	});
 };
 
-var load = function() {
+var load = () => {
 	metadata = document.getElementById('metadata');
 
 	title = document.getElementById('title');
@@ -68,13 +68,13 @@ var load = function() {
 
 	feedback = document.getElementById('feedback');
 
-	metadata.onsubmit = function(ev) {
+	metadata.onsubmit = (ev) => {
 		send();
 
 		ev.preventDefault();
 	};
 
-	metadata.onreset = function(ev) {
+	metadata.onreset = (ev) => {
 		title.value = 'None';
 		composer.value = 'None';
 		live.checked = false;

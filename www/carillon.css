@@ -142,9 +142,11 @@ footer > p {
 #playarrow {
 	display: none;
 
+	font-size: 1.5em;
+
 	position: absolute;
-	top: 4em;
-	left: 1.6em;
+	top: 2.6em;
+	left: 1.1em;
 }
 
 #playing {
@@ -155,7 +157,7 @@ footer > p {
 	display: none;
 }
 
-.mejs-container .mejs-controls {
+.mejs__container, .mejs__offscreen {
 	display: none !important;
 }
 
