@@ -210,16 +210,14 @@ def caddy_generate():
                 if fold.group(2) == 'END':
                     if fold.group(1) == skip:
                         skip = None
-                    continue
-                elif fold.group(2) == 'BEGIN':
+                elif not skip and fold.group(2) == 'BEGIN':
                     if fold.group(1) == 'TLS':
                         if config['http']['tls'] == 'off':
                             skip = 'TLS'
-                        continue
-                    if fold.group(1) == 'UPDATE':
+                    elif fold.group(1) == 'UPDATE':
                         if not config['http']['allow_update'] or config['http']['allow_update'] == 'none':
                             skip = 'UPDATE'
-                        continue
+                continue
 
             if skip:
                 continue
