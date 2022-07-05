@@ -70,8 +70,6 @@ var update = () => {
 			});
 		}
 	});
-
-	setTimeout(update, 1000);
 };
 
 var load = () => {
@@ -162,7 +160,8 @@ var load = () => {
 
 			volupdate();
 			playupdate();
-			update();
+
+			setInterval(update, 1000);
 		}
 	});
 };

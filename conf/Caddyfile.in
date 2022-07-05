@@ -8,7 +8,6 @@
 
 	log {
 		output stdout
-		format single_field common_log
 	}
 
 	file_server
@@ -28,7 +27,7 @@
 		protocol http
 	}
 
-	redir @http https://localhost:8443{uri} permanent
+	redir @http https://%HOST%:8443{uri} permanent
 %%TLS_END%%
 %%UPDATE_BEGIN%%
 

@@ -16,7 +16,7 @@ config.read('carillon.cfg')
 
 
 downloads = {
-    'www': [
+    'www/vendor': [
         'https://www.clemson.edu/_template-assets/1889/fonts/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg',
         'https://www.clemson.edu/_template-assets/1889/fonts/1454a71d-cdbb-429c-8092-122f4493e0c7.woff',
         'https://www.clemson.edu/_template-assets/1889/fonts/1c164451-034c-41f5-9542-390709016510.woff',
@@ -38,14 +38,14 @@ downloads = {
 
         'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.slim.min.js',
 
-        'https://cdn.jsdelivr.net/npm/hls.js@1.1.1/dist/hls.min.js',
-        'https://cdn.jsdelivr.net/npm/hls.js@1.1.1/dist/hls.min.js.map',
+        'https://cdn.jsdelivr.net/npm/hls.js@1.1.5/dist/hls.min.js',
+        'https://cdn.jsdelivr.net/npm/hls.js@1.1.5/dist/hls.min.js.map',
 
-        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.4/build/mediaelementplayer.min.css',
-        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.4/build/mediaelement-and-player.min.js',
-        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.4/build/mejs-controls.svg',
+        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.5/build/mediaelementplayer.min.css',
+        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.5/build/mediaelement-and-player.min.js',
+        'https://cdn.jsdelivr.net/npm/mediaelement@5.0.5/build/mejs-controls.svg',
     ],
-    'upd/www': [
+    'upd/www/vendor': [
         'https://www.clemson.edu/_template-assets/1889/fonts/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg',
         'https://www.clemson.edu/_template-assets/1889/fonts/1454a71d-cdbb-429c-8092-122f4493e0c7.woff',
         'https://www.clemson.edu/_template-assets/1889/fonts/1c164451-034c-41f5-9542-390709016510.woff',

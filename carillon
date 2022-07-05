@@ -66,7 +66,7 @@ class Display:
             file.write(json.dumps({'live': self.live.state, 'title': self.title.edit_text, 'composer': self.composer.edit_text}))
 
         self.feedback.set_text('Stream metadata updated!')
-        self.feedback_timer = 2
+        self.feedback_timer = 3
 
     def clear(self, _=None):
         self.title.set_edit_text('None')

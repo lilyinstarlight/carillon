@@ -42,8 +42,6 @@ var refresh = () => {
 			live.checked = data['live'];
 			last['live'] = data['live'];
 		}
-
-		setTimeout(refresh, 1000);
 	});
 };
 
@@ -84,7 +82,7 @@ var load = () => {
 		ev.preventDefault();
 	};
 
-	refresh();
+	setInterval(refresh, 1000);
 };
 
 window.addEventListener('load', load, false);

@@ -6,17 +6,23 @@
 		<meta charset="utf-8"/>
 
 		<link rel="icon" type="image/png" href="icon.png"/>
+		<link rel="manifest" href="manifest.json"/>
+
 		<meta name="viewport" content="user-scalable=0"/>
 
-		<link rel="stylesheet" href="carillon.css"/>
+		<link rel="stylesheet" href="assets/carillon.css"/>
 
-		<script src="carillon.js"></script>
+		<script src="assets/carillon.js"></script>
+
+		<script>
+			navigator.serviceWorker.register('service-worker.js');
+		</script>
 	</head>
 
 	<body>
 		<header>
 			<div>
-				<img src="white-purple.png" alt=""/>
+				<img src="vendor/white-purple.png" alt=""/>
 				<span>Carillon Updater</span>
 			</div>
 		</header>
