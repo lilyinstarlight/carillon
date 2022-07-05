@@ -27,7 +27,7 @@
 		protocol http
 	}
 
-	redir @http https://%HOST%:8443{uri} permanent
+	redir @http https://{hostport}{uri} permanent
 %%TLS_END%%
 %%UPDATE_BEGIN%%
 
@@ -44,14 +44,14 @@
 %%UPDATE_END%%
 }
 
-http://%HOST%%OPTIONAL_HTTP_PORT% {
+%HTTP_ADDRESS% {
 	bind %BIND%
 
 	import radio
 }
 %%TLS_BEGIN%%
 
-https://%HOST%%OPTIONAL_HTTPS_PORT% {
+%HTTPS_ADDRESS% {
 	bind %BIND%
 
 	tls %TLS%
