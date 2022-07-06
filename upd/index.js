@@ -36,7 +36,7 @@ var router = express.Router();
 
 router.use(express.static('www'));
 
-router.get('/metadata', (req, res) => {
+router.get('/api/metadata', (req, res) => {
   fs.readFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), (err, data) => {
     if (err) {
       console.error('Error reading file');
@@ -50,7 +50,7 @@ router.get('/metadata', (req, res) => {
   });
 });
 
-router.post('/metadata', bodyParser.json(), (req, res) => {
+router.post('/api/metadata', bodyParser.json(), (req, res) => {
   if ('title' in req.body && 'composer' in req.body && 'live' in req.body) {
     fs.writeFile(path.join(__dirname, '..', 'www', 'stream', 'metadata.json'), JSON.stringify({'title': req.body.title, 'composer': req.body.composer, 'live': req.body.live}), (err) => {
       if (err) {

@@ -27,7 +27,7 @@ var xhr = (method, resource, data, callback) => {
 };
 
 var refresh = () => {
-	xhr('get', 'metadata', null, (data) => {
+	xhr('get', 'api/metadata', null, (data) => {
 		if (data['title'] !== last['title']) {
 			title.value = data['title'];
 			last['title'] = data['title'];
@@ -46,7 +46,7 @@ var refresh = () => {
 };
 
 var send = () => {
-	xhr('post', 'metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked}, (response) => {
+	xhr('post', 'api/metadata', {'title': title.value, 'composer': composer.value, 'live': live.checked}, (response) => {
 		feedback.style.display = 'initial';
 		if (timeout)
 			clearTimeout(timeout);

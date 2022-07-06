@@ -24,8 +24,8 @@ const staticFiles = [
 	'/icons/carillon-256.png',
 	'/icons/carillon-512.png',
 
-	// metadata
-	'/metadata',
+	// cacheable endpoints
+	'/api/metadata',
 
 	// vendored assets
 	'/vendor/09f52831-e1cf-48be-9c1e-2d1577e420b7.svg',
