@@ -223,8 +223,8 @@ def caddy_generate():
                 continue
 
             line = line.replace('%BIND%', config['http']['bind'])
-            line = line.replace('%HTTP_ADDRESS%', ', '.join('http://' + host + ':' + (config['http']['http_port'] if config['http']['http_port'] != '80' else '') for host in config['http']['host'].split(' ')))
-            line = line.replace('%HTTPS_ADDRESS%', ', '.join('https://' + host + ':' + (config['http']['https_port'] if config['http']['https_port'] != '443' else '') for host in config['http']['host'].split(' ')))
+            line = line.replace('%HTTP_ADDRESS%', ', '.join('http://' + host + (f':{config["http"]["http_port"]}' if config['http']['http_port'] != '80' else '') for host in config['http']['host'].split(' ')))
+            line = line.replace('%HTTPS_ADDRESS%', ', '.join('https://' + host + (f':{config["http"]["https_port"]}' if config['http']['https_port'] != '443' else '') for host in config['http']['host'].split(' ')))
             line = line.replace('%TLS%', config['http']['tls'])
 
             line = line.replace('%ALLOW_UPDATE%', config['http']['allow_update'])
